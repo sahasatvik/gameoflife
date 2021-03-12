@@ -1,12 +1,9 @@
-#Game of Life
+# Game of Life
 
-<center>
 ![conway](conway-demo.gif)
-</center>
 
 This is an implementation of Conway's Game of Life for the terminal.
 Simply run 
-
 ```
 	gol.py [columns] [rows]
 ```
