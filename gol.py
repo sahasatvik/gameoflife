@@ -1,11 +1,6 @@
 #!/usr/bin/env python3
 
 # Conway's Game of Life, implemented in python with curses
-# Usage:
-#   gol.py [cols] [rows]
-# Here, [cols] and [rows] are the number of columns and rows
-# you want to display in your terminal.
-# Once running, press '?' to get a full list of commands.
 
 import curses
 import curses.textpad
