@@ -148,7 +148,7 @@ def main(stdscr):
     count = 0
     i, j = 0, 0
     autoplay = False
-    playspeed = 1
+    playspeed = 2
     stdscr.nodelay(autoplay)
     while True:
         # stdscr.clear()
@@ -255,10 +255,10 @@ def main(stdscr):
         elif autoplay:
             grid = iterate(grid)
             count += 1
-            if playspeed < 5:
-                sleep(1.0 / (playspeed * 10))
+            if playspeed < 6:
+                sleep(1.0 / (playspeed * 5))
             else:
-                for k in range(playspeed - 4):
+                for k in range(2 * (playspeed - 6)):
                     grid = iterate(grid)
 
 wrapper(main)
