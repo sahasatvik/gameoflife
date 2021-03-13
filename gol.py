@@ -12,14 +12,16 @@ import curses.textpad
 from curses import wrapper
 from random import choice
 from time import sleep
-from os import sys
+import argparse
 
-if len(sys.argv) > 1:
-    cols = int(sys.argv[1])
-    rows = int(sys.argv[2])
-else:
-    cols = 48
-    rows = 16
+parser = argparse.ArgumentParser(description="Conway's Game of Life.")
+parser.add_argument('-w', '--winsize', type=int, nargs=2, default=(16, 48), metavar=('ROWS', 'COLUMNS'), help="number of rows and columns in display")
+parser.add_argument('-p', '--play', action="store_true", help="autoplay on start")
+parser.add_argument('-s', '--speed', type=int, choices=[1, 2, 3, 4, 5, 6, 7, 8, 9], default=2, help="autoplay speed")
+parser.add_argument('-l', '--load', type=str, metavar='FILE', help="load file")
+
+args = parser.parse_args()
+rows, cols = args.winsize
 
 width = cols // 2 - 10
 height = rows - 2
@@ -94,6 +96,14 @@ def load(filename):
                 g[i, j] = False
     return g
 
+def empty():
+    g = dict()
+    for i in range(width):
+        for j in range(height):
+            g[i, j] = False
+    return g
+
+
 def save(g, filename):
     lines = []
     with open(filename, 'w') as f:
@@ -139,16 +149,18 @@ def show_help(stdscr):
 def main(stdscr):
     curses.curs_set(0)
     
-    grid = dict()
-
-    for i in range(width):
-        for j in range(height):
-            grid[i, j] = False
+    grid = empty()
+    
+    try:
+        if args.load:
+            grid = load(args.load)
+    except:
+        pass
     
     count = 0
     i, j = 0, 0
-    autoplay = False
-    playspeed = 2
+    autoplay = args.play
+    playspeed = args.speed
     stdscr.nodelay(autoplay)
     while True:
         # stdscr.clear()
@@ -203,9 +215,7 @@ def main(stdscr):
             grid = translate(grid, -1, 0)
         elif c == ord('C'):
             stdscr.clear()
-            for k in range(width):
-                for l in range(height):
-                    grid[k, l] = False
+            grid = empty()
             count = 0
         elif c == ord('R'):
             stdscr.clear()
