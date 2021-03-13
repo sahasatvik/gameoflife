@@ -11,6 +11,7 @@ import curses
 import curses.textpad
 from curses import wrapper
 from random import choice
+from time import sleep
 from os import sys
 
 if len(sys.argv) > 1:
@@ -108,29 +109,32 @@ def save(g, filename):
 
 def show_help(stdscr):
     x = (2 * width - 26) // 2
-    y = (height - 10) // 2
+    y = (height - 12) // 2
     x, y = max(x, 0), max(y, 0)
     stdscr.addstr( y + 1,      x, "  . <dot> :", curses.A_BOLD)
     stdscr.addstr( y + 1, x + 11, " iterate once   ")
-    stdscr.addstr( y + 2,      x, " 1/2/../9 :", curses.A_BOLD)
-    stdscr.addstr( y + 2, x + 11, " iterate n times")
-    stdscr.addstr( y + 3,      x, "  w/a/s/d :", curses.A_BOLD)
-    stdscr.addstr( y + 3, x + 11, " move pointer   ")
-    stdscr.addstr( y + 4,      x, "  <space> :", curses.A_BOLD)
-    stdscr.addstr( y + 4, x + 11, " toggle cell    ")
-    stdscr.addstr( y + 5,      x, "  W/A/S/D :", curses.A_BOLD)
-    stdscr.addstr( y + 5, x + 11, " move screen    ")
-    stdscr.addstr( y + 6,      x, "        C :", curses.A_BOLD)
-    stdscr.addstr( y + 6, x + 11, " clear and reset")
-    stdscr.addstr( y + 7,      x, "        R :", curses.A_BOLD)
-    stdscr.addstr( y + 7, x + 11, " randomize cells")
-    stdscr.addstr( y + 8,      x, "        V :", curses.A_BOLD)
-    stdscr.addstr( y + 8, x + 11, " save to file   ")
-    stdscr.addstr( y + 9,      x, "        L :", curses.A_BOLD)
-    stdscr.addstr( y + 9, x + 11, " load from file ")
-    stdscr.addstr(y + 10,      x, "        q :", curses.A_BOLD)
-    stdscr.addstr(y + 10, x + 11, " quit           ")
-    drawbox(stdscr, x, y, x + 27, y + 11)
+    stdscr.addstr( y + 2,      x, "        p :", curses.A_BOLD)
+    stdscr.addstr( y + 2, x + 11, " autoplay       ")
+    stdscr.addstr( y + 3,      x, " 1/2/../9 :", curses.A_BOLD)
+    stdscr.addstr( y + 3, x + 11, " iterate n times")
+    stdscr.addstr( y + 4, x + 11, " /autoplay speed")
+    stdscr.addstr( y + 5,      x, "  w/a/s/d :", curses.A_BOLD)
+    stdscr.addstr( y + 5, x + 11, " move pointer   ")
+    stdscr.addstr( y + 6,      x, "  <space> :", curses.A_BOLD)
+    stdscr.addstr( y + 6, x + 11, " toggle cell    ")
+    stdscr.addstr( y + 7,      x, "  W/A/S/D :", curses.A_BOLD)
+    stdscr.addstr( y + 7, x + 11, " move screen    ")
+    stdscr.addstr( y + 8,      x, "        C :", curses.A_BOLD)
+    stdscr.addstr( y + 8, x + 11, " clear and reset")
+    stdscr.addstr( y + 9,      x, "        R :", curses.A_BOLD)
+    stdscr.addstr( y + 9, x + 11, " randomize cells")
+    stdscr.addstr(y + 10,      x, "        V :", curses.A_BOLD)
+    stdscr.addstr(y + 10, x + 11, " save to file   ")
+    stdscr.addstr(y + 11,      x, "        L :", curses.A_BOLD)
+    stdscr.addstr(y + 11, x + 11, " load from file ")
+    stdscr.addstr(y + 12,      x, "        q :", curses.A_BOLD)
+    stdscr.addstr(y + 12, x + 11, " quit           ")
+    drawbox(stdscr, x, y, x + 27, y + 13)
 
 def main(stdscr):
     curses.curs_set(0)
@@ -140,9 +144,12 @@ def main(stdscr):
     for i in range(width):
         for j in range(height):
             grid[i, j] = False
-
+    
     count = 0
     i, j = 0, 0
+    autoplay = False
+    playspeed = 1
+    stdscr.nodelay(autoplay)
     while True:
         # stdscr.clear()
         display(grid, stdscr)
@@ -155,19 +162,27 @@ def main(stdscr):
         else:
             stdscr.addstr(j + 1, 2*i + 1, '┤├', curses.A_REVERSE)
         stdscr.addstr(5, width * 2 + 3, "? for help", curses.A_DIM)
+        if autoplay:
+            stdscr.addstr(7, width * 2 + 3, "Autoplay  ", curses.A_BOLD)
+            stdscr.addstr(8, width * 2 + 3, "p to stop ", curses.A_DIM)
         stdscr.refresh()
         c = stdscr.getch()
         if c == ord('.'):
             grid = iterate(grid)
             count += 1
-        elif chr(c) in '123456789':
-            for k in range(int(chr(c))):
-                grid = iterate(grid)
-                count += 1
+        elif c >= ord('1') and c <= ord('9'):
+            if not autoplay:
+                for k in range(int(chr(c))):
+                    grid = iterate(grid)
+                    count += 1
+            else:
+                playspeed = int(chr(c))
         elif c == ord('?'):
+            stdscr.nodelay(False)
             show_help(stdscr)
             stdscr.getch()
             stdscr.clear()
+            stdscr.nodelay(autoplay)
         elif c == ord('w') or c == curses.KEY_UP:
             j -= 1
         elif c == ord('s') or c == curses.KEY_DOWN:
@@ -199,11 +214,12 @@ def main(stdscr):
                     grid[k, l] = choice([False, True])
             count = 0
         elif c == ord('L'):
+            stdscr.nodelay(False)
             try:
                 curses.echo()
                 curses.curs_set(1)
-                stdscr.addstr(7, width * 2 + 3, "Filename", curses.A_BOLD)
-                stdscr.addstr(8, width * 2 + 3, "(load):", curses.A_BOLD)
+                stdscr.addstr(7, width * 2 + 3, "Filename  ", curses.A_BOLD)
+                stdscr.addstr(8, width * 2 + 3, "(load) :  ", curses.A_BOLD)
                 text = stdscr.getstr(10, width * 2 + 3)
                 curses.curs_set(0)
                 curses.noecho()
@@ -213,23 +229,37 @@ def main(stdscr):
                 stdscr.addstr(12, width * 2 + 3, "Error!", curses.A_BOLD)
                 stdscr.getch()
             stdscr.clear()
+            stdscr.nodelay(autoplay)
         elif c == ord('V'):
+            stdscr.nodelay(False)
             try:
                 curses.echo()
                 curses.curs_set(1)
-                stdscr.addstr(7, width * 2 + 3, "Filename", curses.A_BOLD)
-                stdscr.addstr(8, width * 2 + 3, "(save):", curses.A_BOLD)
+                stdscr.addstr(7, width * 2 + 3, "Filename  ", curses.A_BOLD)
+                stdscr.addstr(8, width * 2 + 3, "(save) :  ", curses.A_BOLD)
                 text = stdscr.getstr(10, width * 2 + 3)
                 curses.curs_set(0)
                 curses.noecho()
                 save(grid, text)
             except:
-                stdscr.addstr(12, width * 2 + 3, "Error!", curses.A_BOLD)
+                stdscr.addstr(12, width * 2 + 3, "Error!   ", curses.A_BOLD)
                 stdscr.getch()
             stdscr.clear()
+            stdscr.nodelay(autoplay)
+        elif c == ord('p'):
+            autoplay = not autoplay
+            stdscr.clear()
+            stdscr.nodelay(autoplay)
         elif c == ord('q'):
             break
-
+        elif autoplay:
+            grid = iterate(grid)
+            count += 1
+            if playspeed < 5:
+                sleep(1.0 / (playspeed * 10))
+            else:
+                for k in range(playspeed - 4):
+                    grid = iterate(grid)
 
 wrapper(main)
 
