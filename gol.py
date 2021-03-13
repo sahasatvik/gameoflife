@@ -127,6 +127,7 @@ def show_help(stdscr):
     stdscr.addstr( y + 2, x + 11, " autoplay       ")
     stdscr.addstr( y + 3,      x, " 1/2/../9 :", curses.A_BOLD)
     stdscr.addstr( y + 3, x + 11, " iterate n times")
+    stdscr.addstr( y + 4,      x, "           ", curses.A_BOLD)
     stdscr.addstr( y + 4, x + 11, " /autoplay speed")
     stdscr.addstr( y + 5,      x, "  w/a/s/d :", curses.A_BOLD)
     stdscr.addstr( y + 5, x + 11, " move pointer   ")
