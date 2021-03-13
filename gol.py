@@ -36,16 +36,16 @@ def cell(g, i, j):
     return g[i, j]
 
 def neighbours(g, i, j):
-    n = []
-    n.append(cell(g, i-1, j-1))
-    n.append(cell(g, i-1, j))
-    n.append(cell(g, i-1, j+1))
-    n.append(cell(g, i, j-1))
-    n.append(cell(g, i, j+1))
-    n.append(cell(g, i+1, j-1))
-    n.append(cell(g, i+1, j))
-    n.append(cell(g, i+1, j+1))
-    return sum(n)
+    n = 0
+    n += cell(g, i-1, j-1) 
+    n += cell(g, i-1, j  ) 
+    n += cell(g, i-1, j+1) 
+    n += cell(g,   i, j-1) 
+    n += cell(g,   i, j+1) 
+    n += cell(g, i+1, j-1) 
+    n += cell(g, i+1, j  ) 
+    n += cell(g, i+1, j+1) 
+    return n
 
 def iterate(g):
     newgrid = dict()
