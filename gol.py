@@ -22,6 +22,7 @@ parser.add_argument('-w', '--winsize', type=int, nargs=2, default=(drows, dcolum
     metavar=('ROWS', 'COLUMNS'), help="number of rows and columns in display")
 parser.add_argument('-p', '--play', action="store_true", help="autoplay on start")
 parser.add_argument('-s', '--speed', type=int, choices=[1, 2, 3, 4, 5, 6, 7, 8, 9], default=2, help="autoplay speed")
+parser.add_argument('-n', '--nowrap', action="store_true", help="do not wrap the game of life world")
 parser.add_argument('-l', '--load', type=str, metavar='FILE', help="load file")
 
 args = parser.parse_args()
@@ -31,6 +32,10 @@ width = cols // 2 - 10
 height = rows - 2
 
 def cell(g, i, j):
+    if args.nowrap:
+        if i >= 0 and j >= 0 and i < width and j < height:
+            return g[i, j]
+        return False
     i = (i + width) % width
     j = (j + height) % height
     return g[i, j]
