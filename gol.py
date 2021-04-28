@@ -13,12 +13,27 @@ import os
 dcolumns, drows = os.get_terminal_size(0)
 
 parser = argparse.ArgumentParser(description="Conway's Game of Life.")
-parser.add_argument('-w', '--winsize', type=int, nargs=2, default=(drows, dcolumns), \
-    metavar=('ROWS', 'COLUMNS'), help="number of rows and columns in display")
-parser.add_argument('-p', '--play', action="store_true", help="autoplay on start")
-parser.add_argument('-s', '--speed', type=int, choices=[1, 2, 3, 4, 5, 6, 7, 8, 9], default=2, help="autoplay speed")
-parser.add_argument('-n', '--nowrap', action="store_true", help="do not wrap the game of life world")
-parser.add_argument('-l', '--load', type=str, metavar='FILE', help="load file")
+parser.add_argument('-w', '--winsize',
+    type=int,
+    nargs=2,
+    default=(drows, dcolumns),
+    metavar=('ROWS', 'COLUMNS'),
+    help="number of rows and columns in display")
+parser.add_argument('-p', '--play',
+    action="store_true",
+    help="autoplay on start")
+parser.add_argument('-s', '--speed',
+    type=int,
+    choices=[1, 2, 3, 4, 5, 6, 7, 8, 9],
+    default=2,
+    help="autoplay speed")
+parser.add_argument('-n', '--nowrap',
+    action="store_true",
+    help="do not wrap the game of life world")
+parser.add_argument('-l', '--load',
+    type=str,
+    metavar='FILE',
+    help="load file")
 
 args = parser.parse_args()
 rows, cols = args.winsize
